@@ -29,5 +29,12 @@ namespace WebApi.Entities
 
         [Column("PasswordSalt")]
         public byte[] PasswordSalt { get; set; }
+
+        [Column("Password")]
+        public string Password { get; set; }
+
+        [Column("userId")]
+        public string userId { get; set; }
+
     }
 }
