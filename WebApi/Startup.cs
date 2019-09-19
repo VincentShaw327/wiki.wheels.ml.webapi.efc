@@ -11,6 +11,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using Microsoft.EntityFrameworkCore;
+using WebApi.DataAccess.Base;
+using WebApi.DataAccess.Implement;
+using WebApi.DataAccess.Interface;
+
 namespace WebApi
 {
     public class Startup
@@ -25,6 +30,9 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<AlanContext>(options => options.UseMySQL(Configuration.GetConnectionString("AlanConnection")));
+            services.AddScoped<IAlanDao, AlanDao>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
