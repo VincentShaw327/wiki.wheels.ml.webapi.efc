@@ -1,13 +1,24 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+using AutoMapper;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+
+
 using WebApi.DataAccess.Interface;
 using WebApi.DataAccess.Base;
 using WebApi.Entities;
+using WebApi.Helpers;
+
 
 namespace WebApi.Controllers
 {
@@ -16,10 +27,68 @@ namespace WebApi.Controllers
     public class UserController : ControllerBase
     {
         private IAlanDao AlanDao;
+        private readonly AppSettings _appSettings;
+        private readonly IMapper _iMapper;
 
-        public UserController(IAlanDao alanDao)
+        public UserController(IAlanDao alanDao, IMapper iMapper, IOptions<AppSettings> appSettings)
         {
             AlanDao = alanDao;
+            _appSettings = appSettings.Value;
+            _iMapper = iMapper;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate([FromBody]User userModel)
+        {
+            var user = AlanDao.Authenticate(userModel.Email, userModel.Password);
+
+            if (user == null)
+                return BadRequest(new { message = "UserName or password is incorrect" });
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.ID.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            // return basic user info (without password) and token to store client side
+            return Ok(new
+            {
+                user.ID,
+                user.UserName,
+                user.FirstName,
+                user.LastName,
+                Token = tokenString
+            });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public IActionResult Register([FromBody]User userModel)
+        {
+            // map dto to entity
+            var user = _iMapper.Map<User>(userModel);
+
+            try
+            {
+                // save 
+                AlanDao.Create(user, userModel.Password);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         //插入数据

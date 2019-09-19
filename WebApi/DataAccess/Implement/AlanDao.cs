@@ -1,21 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApi.DataAccess.Interface;
 using WebApi.DataAccess.Base;
 using WebApi.Entities;
-
+using WebApi.Helpers;
 
 namespace WebApi.DataAccess.Implement
 {
     public class AlanDao : IAlanDao
     {
         public AlanContext Context;
+        private readonly IUserRepository _iUserRepository;
 
         public AlanDao(AlanContext context)
         {
             Context = context;
+        }
+
+        public User Authenticate(string email, string password)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+                return null;
+
+            var user = _iUserRepository.GetUserByEmail(email);
+
+            // check if username exists
+            if (user == null)
+                return null;
+
+            // check if password is correct
+            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+                return null;
+
+            // authentication successful
+            return user;
+        }
+
+        public User Create(User user, string password)
+        {
+            // validation
+            if (string.IsNullOrWhiteSpace(password))
+                throw new AppException("Password is required");
+
+            if (_iUserRepository.Any(x => x.Email == user.Email))
+                throw new AppException("Email \"" + user.Email + "\" is already taken");
+
+            if (_iUserRepository.Any(x => x.UserName == user.UserName))
+                throw new AppException("Username \"" + user.UserName + "\" is already taken");
+
+            CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+
+            user.userId = Guid.NewGuid().ToString();
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            _iUserRepository.Add(user);
+
+            return user;
         }
 
         //插入数据
@@ -83,6 +127,37 @@ namespace WebApi.DataAccess.Implement
         public bool DeleteUserByID(int id)
         {
             throw new NotImplementedException();
+        }
+
+        private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            if (password == null) throw new ArgumentNullException(nameof(password));
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
+
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
+        {
+            if (password == null) throw new ArgumentNullException(nameof(password));
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
+            if (storedHash.Length != 64) throw new ArgumentException("Invalid length of password hash (64 bytes expected).", "passwordHash");
+            if (storedSalt.Length != 128) throw new ArgumentException("Invalid length of password salt (128 bytes expected).", "passwordHash");
+
+            using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                for (int i = 0; i < computedHash.Length; i++)
+                {
+                    if (computedHash[i] != storedHash[i]) return false;
+                }
+            }
+
+            return true;
         }
     }
 }
