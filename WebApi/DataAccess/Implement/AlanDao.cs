@@ -18,6 +18,8 @@ namespace WebApi.DataAccess.Implement
         public AlanDao(AlanContext context)
         {
             Context = context;
+            //_iUserRepository = iUserRepository;
+
         }
 
         public User Authenticate(string email, string password)
@@ -73,6 +75,11 @@ namespace WebApi.DataAccess.Implement
         public IEnumerable<User> GetUsers()
         {
             return Context.User.ToList();
+        }
+
+        public User GetById(string id)
+        {
+            return _iUserRepository.GetById(id);
         }
 
         //取某id记录
