@@ -26,13 +26,13 @@ namespace WebApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private IAlanDao AlanDao;
+        private IUserService UserService;
         private readonly AppSettings _appSettings;
         private readonly IMapper _iMapper;
 
-        public UserController(IAlanDao alanDao, IMapper iMapper, IOptions<AppSettings> appSettings)
+        public UserController(IUserService iUserService, IMapper iMapper, IOptions<AppSettings> appSettings)
         {
-            AlanDao = alanDao;
+            UserService = iUserService;
             _appSettings = appSettings.Value;
             _iMapper = iMapper;
         }
@@ -41,7 +41,7 @@ namespace WebApi.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]User userModel)
         {
-            var user = AlanDao.Authenticate(userModel.Email, userModel.Password);
+            var user = UserService.Authenticate(userModel.Email, userModel.Password);
 
             if (user == null)
                 return BadRequest(new { message = "UserName or password is incorrect" });
@@ -81,7 +81,7 @@ namespace WebApi.Controllers
             try
             {
                 // save 
-                AlanDao.Create(user, userModel.Password);
+                UserService.Create(user, userModel.Password);
                 return Ok();
             }
             catch (AppException ex)
@@ -119,7 +119,7 @@ namespace WebApi.Controllers
                 UserName = userModel.UserName
             };
 
-            var result = AlanDao.CreateUser(student);
+            var result = UserService.CreateUser(student);
 
             if (result)
             {
@@ -138,7 +138,7 @@ namespace WebApi.Controllers
         public ActionResult<string> GetAll()
         {
             var names = "没有数据";
-            var students = AlanDao.GetUsers();
+            var students = UserService.GetUsers();
 
             if (students != null)
             {
@@ -157,7 +157,7 @@ namespace WebApi.Controllers
         public ActionResult<string> GetOne(int ID)
         {
             var name = "没有数据";
-            var student = AlanDao.GetUserByID(ID);
+            var student = UserService.GetUserByID(ID);
 
             if (student != null)
             {
@@ -200,7 +200,7 @@ namespace WebApi.Controllers
                 UserName = UserName
             };
 
-            var result = AlanDao.UpdateUser(user);
+            var result = UserService.UpdateUser(user);
 
             if (result)
             {
@@ -227,7 +227,7 @@ namespace WebApi.Controllers
                 return "姓名不能为空";
             }
 
-            var result = AlanDao.UpdateNameByID(id, name);
+            var result = UserService.UpdateNameByID(id, name);
 
             if (result)
             {
@@ -249,7 +249,7 @@ namespace WebApi.Controllers
                 return "id 不能小于0！";
             }
 
-            var result = AlanDao.DeleteUserByID(id);
+            var result = UserService.DeleteUserByID(id);
 
             if (result)
             {

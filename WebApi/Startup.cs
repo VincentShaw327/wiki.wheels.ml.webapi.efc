@@ -39,53 +39,53 @@ namespace WebApi
             services.AddAutoMapper();
 
             // DI
-            services.AddScoped<IAlanDao, AlanDao>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepository, UserRepository>();
 
             //注册数据库服务
             services.AddDbContext<SqlContext>(options => options.UseMySQL(Configuration.GetConnectionString("AlanConnection")));
-            services.AddScoped<IAlanDao, AlanDao>();
+            services.AddScoped<IUserService, UserService>();
 
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
 
-            // configure jwt authentication
-            //var appSettings = appSettingsSection.Get<AppSettings>();
-            //var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            //services.AddAuthentication(x =>
-            //{
-            //    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //})
-            //    .AddJwtBearer(x =>
-            //    {
-            //        x.Events = new JwtBearerEvents
-            //        {
-            //            OnTokenValidated = context =>
-            //            {
-            //                var userService = context.HttpContext.RequestServices.GetRequiredService<IAlanDao>();
-            //                var userId = context.Principal.Identity.Name;
-            //                var user = userService.GetById(userId);
-            //                if (user == null)
-            //                {
-            //                    // return unauthorized if user no longer exists
-            //                    context.Fail("Unauthorized");
-            //                }
-            //                return Task.CompletedTask;
-            //            }
-            //        };
-            //        x.RequireHttpsMetadata = false;
-            //        x.SaveToken = true;
-            //        x.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateIssuerSigningKey = true,
-            //            IssuerSigningKey = new SymmetricSecurityKey(key),
-            //            ValidateIssuer = false,
-            //            ValidateAudience = false
-            //        };
-            //    });
+            //configure jwt authentication
+           //var appSettings = appSettingsSection.Get<AppSettings>();
+           // var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+           // services.AddAuthentication(x =>
+           // {
+           //     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+           //     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+           // })
+           //     .AddJwtBearer(x =>
+           //     {
+           //         x.Events = new JwtBearerEvents
+           //         {
+           //             OnTokenValidated = context =>
+           //             {
+           //                 var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+           //                 var userId = context.Principal.Identity.Name;
+           //                 var user = userService.GetById(userId);
+           //                 if (user == null)
+           //                 {
+           //                     // return unauthorized if user no longer exists
+           //                     context.Fail("Unauthorized");
+           //                 }
+           //                 return Task.CompletedTask;
+           //             }
+           //         };
+           //         x.RequireHttpsMetadata = false;
+           //         x.SaveToken = true;
+           //         x.TokenValidationParameters = new TokenValidationParameters
+           //         {
+           //             ValidateIssuerSigningKey = true,
+           //             IssuerSigningKey = new SymmetricSecurityKey(key),
+           //             ValidateIssuer = false,
+           //             ValidateAudience = false
+           //         };
+           //     });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -101,7 +101,7 @@ namespace WebApi
             {
                 app.UseHsts();
             }
-
+            //app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
         }

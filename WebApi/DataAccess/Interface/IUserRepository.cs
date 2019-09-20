@@ -9,7 +9,7 @@ using WebApi.Entities;
 
 namespace WebApi.DataAccess.Interface
 {
-    interface IUserRepository
+    public interface IUserRepository
     {
         User GetUserByEmail(string email);
         IEnumerable<User> GetAll();
