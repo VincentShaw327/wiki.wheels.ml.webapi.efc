@@ -12,10 +12,10 @@ namespace WebApi.DataAccess.Implement
 {
     public class AlanDao : IAlanDao
     {
-        public AlanContext Context;
+        public SqlContext Context;
         private readonly IUserRepository _iUserRepository;
 
-        public AlanDao(AlanContext context)
+        public AlanDao(SqlContext context)
         {
             Context = context;
             //_iUserRepository = iUserRepository;
@@ -64,6 +64,11 @@ namespace WebApi.DataAccess.Implement
             return user;
         }
 
+        public User GetById(string id)
+        {
+            return _iUserRepository.GetById(id);
+        }
+
         //插入数据
         public bool CreateUser(User student)
         {
@@ -75,11 +80,6 @@ namespace WebApi.DataAccess.Implement
         public IEnumerable<User> GetUsers()
         {
             return Context.User.ToList();
-        }
-
-        public User GetById(string id)
-        {
-            return _iUserRepository.GetById(id);
         }
 
         //取某id记录

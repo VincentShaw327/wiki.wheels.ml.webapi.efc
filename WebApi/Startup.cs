@@ -43,7 +43,7 @@ namespace WebApi
             services.AddScoped<IUserRepository, UserRepository>();
 
             //注册数据库服务
-            services.AddDbContext<AlanContext>(options => options.UseMySQL(Configuration.GetConnectionString("AlanConnection")));
+            services.AddDbContext<SqlContext>(options => options.UseMySQL(Configuration.GetConnectionString("AlanConnection")));
             services.AddScoped<IAlanDao, AlanDao>();
 
             // configure strongly typed settings objects
