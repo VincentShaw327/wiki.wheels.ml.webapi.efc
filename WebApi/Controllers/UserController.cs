@@ -26,13 +26,13 @@ namespace WebApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private IUserService UserService;
+        private IUserService _iUserService;
         private readonly AppSettings _appSettings;
         private readonly IMapper _iMapper;
 
         public UserController(IUserService iUserService, IMapper iMapper, IOptions<AppSettings> appSettings)
         {
-            UserService = iUserService;
+            _iUserService = iUserService;
             _appSettings = appSettings.Value;
             _iMapper = iMapper;
         }
@@ -41,7 +41,7 @@ namespace WebApi.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]User userModel)
         {
-            var user = UserService.Authenticate(userModel.Email, userModel.Password);
+            var user = _iUserService.Authenticate(userModel.Email, userModel.Password);
 
             if (user == null)
                 return BadRequest(new { message = "UserName or password is incorrect" });
@@ -81,7 +81,7 @@ namespace WebApi.Controllers
             try
             {
                 // save 
-                UserService.Create(user, userModel.Password);
+                _iUserService.Create(user, userModel.Password);
                 return Ok();
             }
             catch (AppException ex)
@@ -90,6 +90,18 @@ namespace WebApi.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        //[AllowAnonymous]
+        [HttpGet]
+        [Route("getsAll")]
+        public IActionResult GetAll()
+        {
+            var users = _iUserService.GetAll();
+            var userModels = _iMapper.Map<IList<User>>(users);
+            return Ok(userModels);
+        }
+
+
 
         //插入数据
         [HttpPost]
@@ -119,7 +131,7 @@ namespace WebApi.Controllers
                 UserName = userModel.UserName
             };
 
-            var result = UserService.CreateUser(student);
+            var result = _iUserService.CreateUser(student);
 
             if (result)
             {
@@ -134,11 +146,11 @@ namespace WebApi.Controllers
 
         //查询所有数据
         [HttpGet]
-        [Route("getsAll")]
-        public ActionResult<string> GetAll()
+        [Route("getsAll0")]
+        public ActionResult<string> GetAll0()
         {
             var names = "没有数据";
-            var students = UserService.GetUsers();
+            var students = _iUserService.GetUsers();
 
             if (students != null)
             {
@@ -157,7 +169,7 @@ namespace WebApi.Controllers
         public ActionResult<string> GetOne(int ID)
         {
             var name = "没有数据";
-            var student = UserService.GetUserByID(ID);
+            var student = _iUserService.GetUserByID(ID);
 
             if (student != null)
             {
@@ -200,7 +212,7 @@ namespace WebApi.Controllers
                 UserName = UserName
             };
 
-            var result = UserService.UpdateUser(user);
+            var result = _iUserService.UpdateUser(user);
 
             if (result)
             {
@@ -227,7 +239,7 @@ namespace WebApi.Controllers
                 return "姓名不能为空";
             }
 
-            var result = UserService.UpdateNameByID(id, name);
+            var result = _iUserService.UpdateNameByID(id, name);
 
             if (result)
             {
@@ -249,7 +261,7 @@ namespace WebApi.Controllers
                 return "id 不能小于0！";
             }
 
-            var result = UserService.DeleteUserByID(id);
+            var result = _iUserService.DeleteUserByID(id);
 
             if (result)
             {
