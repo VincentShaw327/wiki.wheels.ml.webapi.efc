@@ -91,9 +91,9 @@ namespace WebApi.Controllers
             }
         }
 
-        //[AllowAnonymous]
         [HttpGet]
         [Route("getsAll")]
+        [Authorize]
         public IActionResult GetAll()
         {
             var users = _iUserService.GetAll();

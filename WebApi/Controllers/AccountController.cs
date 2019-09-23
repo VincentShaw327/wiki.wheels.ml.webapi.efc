@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using WebApi.Entities;
 using WebApi.Models.AccountViewModels;
 using WebApi.Models;
+using WebApi.HttpProcess;
 
 namespace WebApi.Controllers
 {
@@ -45,6 +46,7 @@ namespace WebApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -89,8 +91,9 @@ namespace WebApi.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel model)
+        public async Task<Response> Login([FromBody] LoginViewModel model)
         {
+            Response res = new Response();
             if (ModelState.IsValid)
             {
                 var user = _userManager.FindByEmailAsync(model.Email);
@@ -118,11 +121,14 @@ namespace WebApi.Controllers
                         expires: DateTime.Now.AddMinutes(30)
                         //signingCredentials: creds
                         );
+                    res.success = 1;
+                    res.message = "success login";
+                    res.token = new JwtSecurityTokenHandler().WriteToken(token);
 
-                    return Ok(new
-                    {
-                        token = new JwtSecurityTokenHandler().WriteToken(token)
-                    });
+                    //return Ok(new
+                    //{
+                    //    token = new JwtSecurityTokenHandler().WriteToken(token)
+                    //});
                 }
                 //if (result.IsLockedOut)
                 //{
@@ -135,9 +141,15 @@ namespace WebApi.Controllers
                 //    return BadRequest("Invalid login attempt.");
                 //    //return View(model);
                 //}
+                res.message = "success login";
+                res.success = 0;
+                return res;
             }
-            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-            return BadRequest("Could not verify username and password");
+            res.success = 0;
+            return res;
+            
+            //ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            //return BadRequest("Could not verify username and password");
         }
 
         // GET: api/User
