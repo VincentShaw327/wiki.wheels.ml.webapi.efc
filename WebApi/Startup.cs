@@ -18,6 +18,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Microsoft.AspNetCore.Rewrite;
+
 
 using WebApi.DataAccess.Base;
 using WebApi.DataAccess.Implement;
@@ -183,6 +187,35 @@ namespace WebApi
 
             //app.UseIdentity();
 
+            //app.Run(async (context) =>
+            //{
+            //    context.Response.ContentType = "text/html";
+            //    //await context.Response.SendFileAsync(Path.Combine(env.WebRootPath, "index.html"));
+            //    await SendFileResponseExtensions.SendFileAsync(Path.Combine(env.WebRootPath, "index.html"));
+            //});
+
+            // set up whatever routes you use with UseMvc()// you may not need to set up any routes here// if you only use attribute routes!
+            
+
+            //handle client side routes
+            //app.Run(async (context) => {
+            //    context.Response.ContentType = "text/html";
+            //    await context.Response.SendFileAsync(Path.Combine(env.WebRootPath, "index.html"));
+            //});
+
+
+            //var rewrite = new RewriteOptions()
+            //    .AddRedirect("films", "/").AddRedirect("/test/*", "/")
+            //    .AddRewrite("actors", "stars", true);
+
+            //app.UseRewriter(rewrite);
+
+            //app.Run(async (context) =>
+            //{
+            //    var path = context.Request.Path;
+            //    var query = context.Request.QueryString;
+            //    await context.Response.WriteAsync($"New URL: {path}{query}");
+            //});
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
             // specifying the Swagger JSON endpoint.
@@ -194,14 +227,23 @@ namespace WebApi
 
             // 配置跨域
             app.UseCors(builder =>
-                builder.AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
+                   builder.AllowAnyOrigin()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .AllowCredentials().WithOrigins("http://localhost:8080")
+
+            //   builder.WithOrigins("http://localhost:8080").AllowAnyHeader()
+            //.AllowAnyMethod()
+            //.AllowCredentials()
             );
 
             app.UseAuthentication();
             //app.UseHttpsRedirection();
-            app.UseMvc();
+            //app.UseMvc();
+
+            app.UseMvc(routes => {
+                routes.MapRoute(name: "default", template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }
