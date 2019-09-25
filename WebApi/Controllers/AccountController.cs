@@ -96,56 +96,59 @@ namespace WebApi.Controllers
             Response res = new Response();
             if (ModelState.IsValid)
             {
-                var user = _userManager.FindByEmailAsync(model.Email);
-                var result =
-                    await _signInManager.CheckPasswordSignInAsync(user.Result, model.Password, lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User logged in.");
-                    var claims = new Claim[]
+                
+                    var user = _userManager.FindByEmailAsync(model.Email);
+                    var result =
+                        await _signInManager.CheckPasswordSignInAsync(user.Result, model.Password, lockoutOnFailure: false);
+                    if (result.Succeeded)
                     {
+                        _logger.LogInformation("User logged in.");
+                        var claims = new Claim[]
+                        {
                         new Claim(ClaimTypes.Email, model.Email),
                         new Claim(ClaimTypes.Name, user.Result.UserName),
                         new Claim("Id", user.Id.ToString()),
                         new Claim("FirstName", user.Result.FirstName),
                         new Claim("LastName", user.Result.LastName),
-                    };
-                    //var key = new SymmetricSecurityKey();
-                    //var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                    //var t = new JwtSecurityToken(
-                    //    claims:claims)
-                    var token = new JwtSecurityToken(
-                        claims: claims,
-                        issuer: "yourdomain.com",
-                        audience: "yourdomain.com",
-                        expires: DateTime.Now.AddMinutes(30)
-                        //signingCredentials: creds
-                        );
-                    res.success = 1;
-                    res.message = "success login";
-                    res.token = new JwtSecurityTokenHandler().WriteToken(token);
-
-                    //return Ok(new
+                        };
+                        //var key = new SymmetricSecurityKey();
+                        //var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                        //var t = new JwtSecurityToken(
+                        //    claims:claims)
+                        var token = new JwtSecurityToken(
+                            claims: claims,
+                            issuer: "yourdomain.com",
+                            audience: "yourdomain.com",
+                            expires: DateTime.Now.AddMinutes(30)
+                            //signingCredentials: creds
+                            );
+                        res.success = 1;
+                        res.message = "success login";
+                        res.token = new JwtSecurityTokenHandler().WriteToken(token);
+                        return res;
+                        //return Ok(new
+                        //{
+                        //    token = new JwtSecurityTokenHandler().WriteToken(token)
+                        //});
+                    }
+                    //if (result.IsLockedOut)
                     //{
-                    //    token = new JwtSecurityTokenHandler().WriteToken(token)
-                    //});
-                }
-                //if (result.IsLockedOut)
-                //{
-                //    _logger.LogWarning("User account locked out.");
-                //    //return RedirectToAction(nameof(Lockout));
-                //}
-                //else
-                //{
-                //    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                //    return BadRequest("Invalid login attempt.");
-                //    //return View(model);
-                //}
-                res.message = "success login";
-                res.success = 0;
-                return res;
+                    //    _logger.LogWarning("User account locked out.");
+                    //    //return RedirectToAction(nameof(Lockout));
+                    //}
+                    //else
+                    //{
+                    //    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    //    return BadRequest("Invalid login attempt.");
+                    //    //return View(model);
+                    //}
+                    res.message = "fail login";
+                    res.success = 0;
+                    return res;
+              
+                
             }
-            res.success = 0;
+            //res.success = 0;
             return res;
             
             //ModelState.AddModelError(string.Empty, "Invalid login attempt.");
