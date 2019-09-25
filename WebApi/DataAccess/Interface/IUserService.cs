@@ -7,8 +7,16 @@ using WebApi.Entities;
 
 namespace WebApi.DataAccess.Interface
 {
-    public interface IAlanDao
+    public interface IUserService
     {
+        User Authenticate(string email, string password);
+        IEnumerable<User> GetAll();
+        User GetById(string id);
+        User Create(User user, string password);
+        void Update(User user, string password = null);
+        void Delete(string id);
+
+
         //插入数据
         bool CreateUser(User user) ;
 

@@ -1,13 +1,24 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+using AutoMapper;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+
+
 using WebApi.DataAccess.Interface;
 using WebApi.DataAccess.Base;
 using WebApi.Entities;
+using WebApi.Helpers;
+
 
 namespace WebApi.Controllers
 {
@@ -15,12 +26,82 @@ namespace WebApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private IAlanDao AlanDao;
+        private IUserService _iUserService;
+        private readonly AppSettings _appSettings;
+        private readonly IMapper _iMapper;
 
-        public UserController(IAlanDao alanDao)
+        public UserController(IUserService iUserService, IMapper iMapper, IOptions<AppSettings> appSettings)
         {
-            AlanDao = alanDao;
+            _iUserService = iUserService;
+            _appSettings = appSettings.Value;
+            _iMapper = iMapper;
         }
+
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate([FromBody]User userModel)
+        {
+            var user = _iUserService.Authenticate(userModel.Email, userModel.Password);
+
+            if (user == null)
+                return BadRequest(new { message = "UserName or password is incorrect" });
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.ID.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            // return basic user info (without password) and token to store client side
+            return Ok(new
+            {
+                user.ID,
+                user.UserName,
+                user.FirstName,
+                user.LastName,
+                Token = tokenString
+            });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public IActionResult Register([FromBody]User userModel)
+        {
+            // map dto to entity
+            var user = _iMapper.Map<User>(userModel);
+
+            try
+            {
+                // save 
+                _iUserService.Create(user, userModel.Password);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("getsAll")]
+        [Authorize]
+        public IActionResult GetAll()
+        {
+            var users = _iUserService.GetAll();
+            var userModels = _iMapper.Map<IList<User>>(users);
+            return Ok(userModels);
+        }
+
+
 
         //插入数据
         [HttpPost]
@@ -50,7 +131,7 @@ namespace WebApi.Controllers
                 UserName = userModel.UserName
             };
 
-            var result = AlanDao.CreateUser(student);
+            var result = _iUserService.CreateUser(student);
 
             if (result)
             {
@@ -65,11 +146,11 @@ namespace WebApi.Controllers
 
         //查询所有数据
         [HttpGet]
-        [Route("getsAll")]
-        public ActionResult<string> GetAll()
+        [Route("getsAll0")]
+        public ActionResult<string> GetAll0()
         {
             var names = "没有数据";
-            var students = AlanDao.GetUsers();
+            var students = _iUserService.GetUsers();
 
             if (students != null)
             {
@@ -88,7 +169,7 @@ namespace WebApi.Controllers
         public ActionResult<string> GetOne(int ID)
         {
             var name = "没有数据";
-            var student = AlanDao.GetUserByID(ID);
+            var student = _iUserService.GetUserByID(ID);
 
             if (student != null)
             {
@@ -131,7 +212,7 @@ namespace WebApi.Controllers
                 UserName = UserName
             };
 
-            var result = AlanDao.UpdateUser(user);
+            var result = _iUserService.UpdateUser(user);
 
             if (result)
             {
@@ -158,7 +239,7 @@ namespace WebApi.Controllers
                 return "姓名不能为空";
             }
 
-            var result = AlanDao.UpdateNameByID(id, name);
+            var result = _iUserService.UpdateNameByID(id, name);
 
             if (result)
             {
@@ -180,7 +261,7 @@ namespace WebApi.Controllers
                 return "id 不能小于0！";
             }
 
-            var result = AlanDao.DeleteUserByID(id);
+            var result = _iUserService.DeleteUserByID(id);
 
             if (result)
             {
