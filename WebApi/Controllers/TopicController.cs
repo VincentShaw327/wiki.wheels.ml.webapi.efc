@@ -57,7 +57,7 @@ namespace WebApi.Controllers
             }
 
             //var wiki_topic = await _context.Wiki_topic.FindAsync(ikd);
-            var list =  _context.Wiki_topic.Where(b => b.uObjectCategoryUUID == id).ToList();
+            var list =  _context.Wiki_topic.Where(b => b.uObjectCategoryUUID == id&&b.nDelFlag==1).ToList();
 
             if (list == null)
             {
@@ -72,29 +72,32 @@ namespace WebApi.Controllers
 
         // PUT: api/Wiki_topic/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutWiki_topic([FromRoute] int id, [FromBody] Topic wiki_topic)
+        public async Task<Response> PutWiki_topic([FromRoute] int id, [FromBody] Topic wiki_topic)
         {
+            Response res = new Response();
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                //return BadRequest(ModelState);
             }
 
             if (id != wiki_topic.ID)
             {
-                return BadRequest();
+                //return BadRequest();
             }
 
             _context.Entry(wiki_topic).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+               await _context.SaveChangesAsync();
+                res.dataList = wiki_topic;
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!Wiki_topicExists(id))
                 {
-                    return NotFound();
+                    //return NotFound();
                 }
                 else
                 {
@@ -102,43 +105,55 @@ namespace WebApi.Controllers
                 }
             }
 
-            return NoContent();
+            //return NoContent();
+            //res.dataList = list;
+            res.success = 1;
+            return res;
         }
 
         // POST: api/Wiki_topic
         [HttpPost]
-        public async Task<IActionResult> PostWiki_topic([FromBody] Topic wiki_topic)
+        public async Task<Response> PostWiki_topic([FromBody] Topic wiki_topic)
         {
+            Response res = new Response();
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                //return BadRequest(ModelState);
             }
 
             _context.Wiki_topic.Add(wiki_topic);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetWiki_topic", new { id = wiki_topic.ID }, wiki_topic);
+            res.dataList = CreatedAtAction("GetWiki_topic", new { id = wiki_topic.ID }, wiki_topic).Value;
+            res.success = 1;
+            return res;
         }
 
         // DELETE: api/Wiki_topic/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteWiki_topic([FromRoute] int id)
+        public async Task<Response> DeleteWiki_topic([FromRoute] int id)
         {
+            Response res = new Response();
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                //return BadRequest(ModelState);
             }
 
             var wiki_topic = await _context.Wiki_topic.FindAsync(id);
             if (wiki_topic == null)
             {
-                return NotFound();
+                //return NotFound();
             }
 
             _context.Wiki_topic.Remove(wiki_topic);
             await _context.SaveChangesAsync();
 
-            return Ok(wiki_topic);
+            //return Ok(wiki_topic);
+            res.dataList = wiki_topic;
+            res.success = 1;
+            return res;
         }
 
         private bool Wiki_topicExists(int id)

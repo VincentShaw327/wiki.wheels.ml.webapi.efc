@@ -40,6 +40,6 @@ namespace WebApi.Entities
         public int uDutyUserUUID { get; set; }
 
         [Column("nDelFlag")]
-        public int nDelFlag { get; set; }
+        public int nDelFlag { get; set; } = 1;
     }
 }
