@@ -62,27 +62,35 @@ namespace WebApi.Controllers
                 //return BadRequest(ModelState);
             }
 
-            var list=_context.Wiki_item.Where(b => b.uTopicUUID==wiki.uTopicUUID&& b.uObjectParentUUID == 0).ToList();
+            var list=_context.Wiki_item.Where(
+                b => b.uTopicUUID==wiki.uTopicUUID&& b.uObjectParentUUID == wiki.uObjectParentUUID
+                &&b.nDelFlag==1
+                ).ToList();
+            var obj = await _context.Wiki_topic.FindAsync(wiki.uTopicUUID);
+
             //await _context.SaveChangesAsync();
 
             //return CreatedAtAction("GetWiki", new { id = wiki.ID }, wiki);
             res.dataList = list;
             res.success = 1;
+            res.obj = obj;
             return res;
         }
 
         // PUT: api/Wikis/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutWiki([FromRoute] int id, [FromBody] Wiki wiki)
+        public async Task<Response> PutWiki([FromRoute] int id, [FromBody] Wiki wiki)
         {
+            Response res = new Response();
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                //return BadRequest(ModelState);
             }
 
             if (id != wiki.ID)
             {
-                return BadRequest();
+                //return BadRequest();
             }
 
             _context.Entry(wiki).State = EntityState.Modified;
@@ -90,12 +98,13 @@ namespace WebApi.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                res.obj = wiki;
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!WikiExists(id))
                 {
-                    return NotFound();
+                    //return NotFound();
                 }
                 else
                 {
@@ -103,22 +112,55 @@ namespace WebApi.Controllers
                 }
             }
 
-            return NoContent();
+            //return NoContent();
+            res.success = 1;
+            return res;
         }
 
         // POST: api/Wikis
         [HttpPost]
-        public async Task<IActionResult> PostWiki([FromBody] Wiki wiki)
+        public async Task<Response> PostWiki([FromBody] Wiki wiki)
         {
+            Response res = new Response();
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                //return BadRequest(ModelState);
             }
 
             _context.Wiki_item.Add(wiki);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetWiki", new { id = wiki.ID }, wiki);
+            res.obj= CreatedAtAction("GetWiki", new { id = wiki.ID }, wiki).Value;
+            res.success = 1;
+            return res;
+        }
+
+        [HttpPost("updateChildren")]
+        public async Task<Response> UpdateChildren([FromBody] Wiki wiki)
+        {
+            Response res = new Response();
+
+            if (!ModelState.IsValid)
+            {
+                //return BadRequest(ModelState);
+            }
+            var list = _context.Wiki_item.Where(b => b.uObjectParentUUID == wiki.ID && b.nDelFlag == 1).ToList();
+            var wikiTemp = await _context.Wiki_item.FindAsync(wiki.ID);
+            if (list.Count >= 1)
+            {
+                wikiTemp.nHasChildren = 1;
+            }
+            else
+            {
+                wikiTemp.nHasChildren = 0;
+            }
+            await _context.SaveChangesAsync();
+            //_context.Wiki_item.Add(wiki);
+
+            //res.obj = CreatedAtAction("GetWiki", new { id = wiki.ID }, wiki).Value;
+            res.success = 1;
+            return res;
         }
 
         // DELETE: api/Wikis/5

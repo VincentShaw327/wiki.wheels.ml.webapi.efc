@@ -55,7 +55,7 @@ namespace WebApi.Entities
         public int nHasChildren { get; set; }
 
         [Column("nDelFlag")]
-        public int nDelFlag { get; set; }
+        public int nDelFlag { get; set; } = 1;
 
         [Column("dtCreate")]
         public DateTime dtCreate { get; set; }
