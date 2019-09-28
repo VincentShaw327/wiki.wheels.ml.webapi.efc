@@ -11,12 +11,15 @@ namespace WebApi.HttpProcess
         public string message;
         public object token;
         public object dataList;
+        public object obj;
+
 
         public Response()
         {
             success = 0;
             message = "";
             token = "";
+            //obj =null;
         }
     }
 }
