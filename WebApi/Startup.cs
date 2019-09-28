@@ -230,8 +230,9 @@ namespace WebApi
                    builder.AllowAnyOrigin()
                        .AllowAnyHeader()
                        .AllowAnyMethod()
-                       .AllowCredentials().WithOrigins("http://localhost:8080")
+                       .AllowCredentials()
 
+                       //.WithOrigins("http://localhost:8080")
             //   builder.WithOrigins("http://localhost:8080").AllowAnyHeader()
             //.AllowAnyMethod()
             //.AllowCredentials()
