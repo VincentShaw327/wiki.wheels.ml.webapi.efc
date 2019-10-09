@@ -123,7 +123,7 @@ namespace WebApi.Controllers
                             //signingCredentials: creds
                             );
                         res.success = 1;
-                        res.message = "success login";
+                        res.resTxt = "success login";
                         res.token = new JwtSecurityTokenHandler().WriteToken(token);
                         return res;
                         //return Ok(new
@@ -142,7 +142,7 @@ namespace WebApi.Controllers
                     //    return BadRequest("Invalid login attempt.");
                     //    //return View(model);
                     //}
-                    res.message = "fail login";
+                    res.resTxt = "fail login";
                     res.success = 0;
                     return res;
               
