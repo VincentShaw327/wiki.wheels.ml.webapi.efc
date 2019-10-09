@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="HttpProcess\Request\" />
     <Folder Include="HttpProcess\Error\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>

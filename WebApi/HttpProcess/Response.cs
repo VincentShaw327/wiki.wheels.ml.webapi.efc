@@ -8,7 +8,7 @@ namespace WebApi.HttpProcess
     public class Response
     {
         public int success;
-        public string message;
+        public string resTxt;
         public object token;
         public object dataList;
         public object obj;
@@ -17,7 +17,7 @@ namespace WebApi.HttpProcess
         public Response()
         {
             success = 0;
-            message = "";
+            resTxt = "";
             token = "";
             //obj =null;
         }

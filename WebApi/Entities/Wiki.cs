@@ -21,6 +21,9 @@ namespace WebApi.Entities
         [Column("uTopicUUID")]
         public int uTopicUUID { get; set; }
 
+        [Column("orderID")]
+        public int orderID { get; set; }
+
         [Column("strImage")]
         public string strImage { get; set; }
 
@@ -62,5 +65,17 @@ namespace WebApi.Entities
 
         [Column("dtUpdate")]
         public DateTime dtUpdate { get; set; }
+
+
+
+        public int CompareTo(Wiki comparePart)
+        {
+            // A null value means that this object is greater.
+            if (comparePart == null)
+                return 1;
+
+            else
+                return this.orderID.CompareTo(comparePart.orderID);
+        }
     }
 }
