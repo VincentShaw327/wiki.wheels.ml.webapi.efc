@@ -14,7 +14,7 @@ namespace WebApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.11-servicing-32099");
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
@@ -223,6 +223,9 @@ namespace WebApi.Migrations
                     b.Property<int>("nHasChildren")
                         .HasColumnName("nHasChildren");
 
+                    b.Property<int>("orderID")
+                        .HasColumnName("orderID");
+
                     b.Property<string>("strContent")
                         .HasColumnName("strContent");
 
@@ -259,6 +262,20 @@ namespace WebApi.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("t_wiki_item");
+                });
+
+            modelBuilder.Entity("WebApi.Models.AccountRole", b =>
+                {
+                    b.Property<int>("ClubId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("RoleId");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("ClubId");
+
+                    b.ToTable("aspnetuserroles");
                 });
 
             modelBuilder.Entity("WebApi.Models.ApplicationRole", b =>
@@ -336,6 +353,22 @@ namespace WebApi.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("WebApi.Models.Userclaims", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ClaimType");
+
+                    b.Property<string>("ClaimValue");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("aspnetuserclaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

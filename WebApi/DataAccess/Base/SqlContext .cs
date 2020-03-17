@@ -48,5 +48,9 @@ namespace WebApi.DataAccess.Base
         public DbSet<Topic> Wiki_topic { get; set; }
         public DbSet<Wiki> Wiki_item { get; set; }
         public DbSet<Category> Topic_category { get; set; }
+        public DbSet<AccountRole> aspnetuserroles { get; set; }
+        public DbSet<Userclaims> aspnetuserclaims { get; set; }
+
+
     }
 }

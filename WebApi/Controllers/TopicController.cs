@@ -29,7 +29,7 @@ namespace WebApi.Controllers
         // GET: api/Wiki_topic
         //[AllowAnonymous]
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public Response GetWiki_topic()
         {
             Response res = new Response();
@@ -46,7 +46,7 @@ namespace WebApi.Controllers
 
         // GET: api/Wiki_topic/5
         [HttpGet("{id}")]
-        //[Authorize]
+        //[Authorize("Permission")]
         public async Task<Response> GetWiki_topic([FromRoute] int id)
         {
             Response res = new Response();

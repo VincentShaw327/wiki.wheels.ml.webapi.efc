@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 using WebApi.DataAccess.Base;
 using WebApi.Entities;
 using WebApi.HttpProcess;
@@ -12,8 +15,10 @@ using WebApi.HttpProcess.Request;
 
 namespace WebApi.Controllers
 {
+    //[Authorize("Permission")]
     [Route("api/[controller]")]
-    [ApiController]
+    //[ApiController]
+    //[Authorize(Roles = "admin,system")]
     public class WikiController : ControllerBase
     {
         private readonly SqlContext _context;
@@ -54,6 +59,8 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
+        //[Authorize("Permission")]
         [Route("item")]
         public async Task<Response> GetItem([FromBody] Wiki wiki)
         {

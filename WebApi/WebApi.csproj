@@ -1,8 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20190924121533_Wiki.cs" />
+    <Compile Remove="Migrations\20190924121533_Wiki.Designer.cs" />
+    <Compile Remove="Migrations\20190924143845_category.cs" />
+    <Compile Remove="Migrations\20190924143845_category.Designer.cs" />
+    <Compile Remove="Migrations\20191011093057_Initial.cs" />
+    <Compile Remove="Migrations\20191011093057_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20191011093359_Initial.cs" />
+    <Compile Remove="Migrations\20191011093359_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20191011094022_Initial.cs" />
+    <Compile Remove="Migrations\20191011094022_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20191011094542_userclaims.cs" />
+    <Compile Remove="Migrations\20191011094542_userclaims.Designer.cs" />
+    <Compile Remove="Migrations\20191011095607_userclaims.cs" />
+    <Compile Remove="Migrations\20191011095607_userclaims.Designer.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="HttpProcess\Error\" />
@@ -12,13 +29,14 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.11" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.1" />
     <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="8.0.17" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.1" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
   </ItemGroup>
 
