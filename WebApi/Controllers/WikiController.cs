@@ -59,8 +59,8 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        //[Authorize("Permission")]
+        //[Authorize]
+        ////[Authorize("Permission")]
         [Route("item")]
         public async Task<Response> GetItem([FromBody] Wiki wiki)
         {

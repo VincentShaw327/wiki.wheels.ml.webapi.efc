@@ -50,6 +50,7 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddAutoMapper();
 
             // DI
@@ -59,6 +60,14 @@ namespace WebApi
             //注册数据库服务
             services.AddDbContext<SqlContext>(options => options.UseMySQL(Configuration.GetConnectionString("AlanConnection")));
             services.AddScoped<IUserService, UserService>();
+
+            services.AddIdentity<ApplicationUser, ApplicationRole>()  //ApplicationUser  IdentityRole  AccountRole
+            .AddEntityFrameworkStores<SqlContext>()
+            .AddDefaultTokenProviders();
+
+            //services.AddIdentity<User, IdentityRole>()
+            //    .AddEntityFrameworkStores<VueContext>()
+            //    .AddDefaultTokenProviders();
 
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
@@ -74,6 +83,7 @@ namespace WebApi
             var symmetricKeyAsBase64 = audienceConfig["Secret"];
             var keyByteArray = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyByteArray);
+
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
@@ -98,7 +108,7 @@ namespace WebApi
                               new Permission {  Url="/", Name="system"},
                               new Permission {  Url="/api/values1", Name="system"}
                           };
-            //如果第三个参数，是ClaimTypes.Role，上面集合的每个元素的Name为角色名称，如果ClaimTypes.Name，即上面集合的每个元素的Name为用户名
+            //如果第三个参数是ClaimTypes.Role，上面集合的每个元素的Name为角色名称，如果ClaimTypes.Name，即上面集合的每个元素的Name为用户名
             var permissionRequirement = new PermissionRequirement(
                 "/api/denied", permission,
                 ClaimTypes.Name,
@@ -169,14 +179,6 @@ namespace WebApi
                     //    ValidateAudience = false
                     //};
                 });
-
-            services.AddIdentity<ApplicationUser, ApplicationRole>()  //ApplicationUser  IdentityRole  AccountRole
-                .AddEntityFrameworkStores<SqlContext>()
-                .AddDefaultTokenProviders();
-
-            //services.AddIdentity<User, IdentityRole>()
-            //    .AddEntityFrameworkStores<VueContext>()
-            //    .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -320,7 +322,7 @@ namespace WebApi
             );
 
             app.UseAuthentication();
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             //app.UseMvc();
 
             app.UseMvc(routes =>

@@ -93,7 +93,7 @@ namespace WebApi.Controllers
                 catch (System.Exception ex)
                 {
                     res.success = 0;
-                    res.resTxt = "success register";
+                    res.resTxt = "err register";
                     //return res;
 
                     //eError = TError.TError_DataBase_Exception;
@@ -136,17 +136,17 @@ namespace WebApi.Controllers
                     {
                         _logger.LogInformation("User logged in.");
                         var claims = new Claim[]
-                        {
-                        //new Claim(ClaimTypes.Email, model.Email),
-                        new Claim(ClaimTypes.Name, user.Result.UserName),
-                        new Claim(ClaimTypes.Expiration, now.Add(_requirement.Expiration).ToString()),
+                            {
+                            //new Claim(ClaimTypes.Email, model.Email),
+                            new Claim(ClaimTypes.Name, user.Result.UserName),
+                            new Claim(ClaimTypes.Expiration, now.Add(_requirement.Expiration).ToString()),
 
-                        //new Claim(ClaimTypes.Name, user.Result.ID.ToString()),
-                        new Claim("Id", user.Id.ToString()),
-                        new Claim("FirstName", user.Result.FirstName),
-                        new Claim("LastName", user.Result.LastName),
-                        new Claim("Name", user.Result.UserName),
-                        };
+                            //new Claim(ClaimTypes.Name, user.Result.ID.ToString()),
+                            new Claim("Id", user.Id.ToString()),
+                            //new Claim("FirstName", user.Result.FirstName),
+                            //new Claim("LastName", user.Result.LastName),
+                            new Claim("Name", user.Result.UserName),
+                            };
                     //var key = new SymmetricSecurityKey();
                     //var audienceConfig = Configuration.GetSection("Audience");
                     //var symmetricKeyAsBase64 = audienceConfig["Secret"];

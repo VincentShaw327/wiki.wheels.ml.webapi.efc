@@ -14,7 +14,8 @@ namespace WebApi
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            //CreateWebHostBuilder(args).Build().Run();
+            CreateWebHostBuilder(args).UseKestrel().UseUrls("http://*:5000", "https://*:5001").Build().Run()  ;
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
